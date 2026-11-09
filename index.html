@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starlight 7 — Cultural Activities</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            background: radial-gradient(ellipse at center, #1a1630 0%, #0a0815 100%);
+            min-height: 100vh; padding: 20px; color: #fff; display: flex; justify-content: center; align-items: flex-start;
+        }
+        .app {
+            max-width: 850px; width: 100%; background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(20px); border-radius: 40px; padding: 30px 28px;
+            border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 40px 100px rgba(0, 0, 0, 0.7);
+            display: flex; flex-direction: column; align-items: center;
+        }
+        
+        /* --- ШАПКА И ВКЛАДКИ --- */
+        .header { text-align: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px dashed rgba(77, 171, 247, 0.4); width: 100%; }
+        .header h1 { font-size: 28px; font-weight: 800; color: #fff; text-shadow: 0 0 20px rgba(77, 171, 247, 0.8); }
+        .header .sub { font-size: 14px; color: #b5aad0; letter-spacing: 2px; }
+        
+        .main-tabs { display: flex; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; justify-content: center; }
+        .tab-btn { padding: 10px 24px; border-radius: 40px; border: 2px solid rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.04); color: #b5aad0; font-size: 14px; font-weight: 600; transition: 0.25s; font-family: inherit; cursor: pointer; }
+        .tab-btn:hover { background: rgba(255, 255, 255, 0.1); }
+        .tab-btn.active { background: linear-gradient(135deg, #4dabf7, #3d7bf7); border-color: #74c0fc; color: #fff; box-shadow: 0 8px 30px rgba(77, 171, 247, 0.3); }
+        
+        .tab-content { display: none; width: 100%; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: flex; flex-direction: column; align-items: center; }
+        @keyframes fadeIn { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
+
+        /* --- ФЛЕШ-КАРТОЧКИ --- */
+        .flashcard-container { width: 100%; max-width: 450px; height: 450px; perspective: 1000px; margin-bottom: 20px; cursor: pointer; }
+        .flashcard { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.6s; }
+        .flashcard.flipped { transform: rotateY(180deg); }
+        
+        .card-face {
+            position: absolute; width: 100%; height: 100%;
+            backface-visibility: hidden; -webkit-backface-visibility: hidden;
+            border-radius: 24px; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .card-front { background: #0a0815; padding: 15px; }
+        .card-front img { width: 100%; height: 100%; object-fit: contain; border-radius: 16px; }
+        .card-back { background: linear-gradient(135deg, #2a1f4a, #1a1630); transform: rotateY(180deg); padding: 30px; text-align: center; }
+        .card-back h2 { font-size: 26px; color: #fff; line-height: 1.4; margin-bottom: 15px; }
+        .card-back span { font-size: 14px; color: #b5aad0; text-transform: uppercase; letter-spacing: 2px; }
+
+        /* --- КНОПКИ --- */
+        .controls { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
+        .btn { padding: 12px 28px; border-radius: 60px; border: 2px solid rgba(255, 255, 255, 0.15); background: rgba(255, 255, 255, 0.05); color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: inherit; }
+        .btn:hover { background: rgba(255, 255, 255, 0.15); transform: scale(1.05); }
+        
+        .counter { font-size: 16px; color: #b5aad0; margin-top: 15px; font-weight: 600; }
+
+        /* --- ЗАДАНИЕ PAST CONTINUOUS --- */
+        .task-header { text-align: center; margin-bottom: 20px; width: 100%; max-width: 600px; }
+        .task-header h2 { color: #74c0fc; font-size: 22px; margin-bottom: 8px; }
+        .task-header p { color: #b5aad0; font-size: 15px; line-height: 1.5; }
+        
+        .ex-card { background: rgba(255, 255, 255, 0.03); border-radius: 24px; padding: 20px; border: 1px solid rgba(255, 255, 255, 0.08); display: flex; flex-direction: column; gap: 15px; align-items: center; width: 100%; max-width: 600px; }
+        
+        .ex-img-wrapper { width: 100%; max-width: 400px; height: 300px; border-radius: 16px; overflow: hidden; background: #000; cursor: pointer; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .ex-img-wrapper img { width: 100%; height: 100%; object-fit: contain; }
+        .play-overlay { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.7); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; transition: 0.2s; }
+        .ex-img-wrapper:hover .play-overlay { background: #4dabf7; transform: scale(1.1); }
+        
+        .ex-body { width: 100%; display: flex; flex-direction: column; gap: 15px; align-items: center; }
+        .ex-label { font-size: 18px; color: #fff; font-weight: 700; text-align: center; }
+        
+        .input-group { width: 100%; }
+        .ex-input { width: 100%; padding: 14px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.2); color: #fff; font-size: 16px; font-family: inherit; outline: none; transition: 0.2s; text-align: center; }
+        .ex-input:focus { border-color: #4dabf7; background: rgba(0,0,0,0.4); }
+        
+        .word-bank { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; width: 100%; }
+        .word-chip { padding: 8px 16px; background: rgba(77, 171, 247, 0.15); border: 1px solid #4dabf7; border-radius: 20px; color: #74c0fc; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.2s; user-select: none; }
+        .word-chip:hover { background: rgba(77, 171, 247, 0.4); transform: translateY(-2px); }
+
+        .footer-note { text-align: center; margin-top: 30px; font-size: 13px; color: rgba(255, 255, 255, 0.3); width: 100%; }
+
+        @media (max-width: 600px) {
+            .ex-img-wrapper { height: 250px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <div class="header">
+        <h1>🎭 Cultural Activities</h1>
+        <div class="sub">Starlight 7 • Module 2a</div>
+    </div>
+
+    <div class="main-tabs">
+        <button class="tab-btn active" data-tab="tab-flash">🃏 Flashcards</button>
+        <button class="tab-btn" data-tab="tab-practice">✍️ What were they doing?</button>
+    </div>
+
+    <!-- ================= ВКЛАДКА 1: ФЛЕШ-КАРТОЧКИ ================= -->
+    <div id="tab-flash" class="tab-content active">
+        <div class="flashcard-container" onclick="flipCard()">
+            <div class="flashcard" id="flashcard">
+                <div class="card-face card-front">
+                    <img id="cardImage" src="" alt="Activity">
+                </div>
+                <div class="card-face card-back">
+                    <span>Phrase:</span>
+                    <h2 id="cardText">...</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="event.stopPropagation(); prevCard()">← Prev</button>
+            <button class="btn" onclick="event.stopPropagation(); flipCard()">🔄 Flip</button>
+            <button class="btn" onclick="event.stopPropagation(); nextCard()">Next →</button>
+        </div>
+        <div class="counter" id="counter">1 / 6</div>
+    </div>
+
+    <!-- ================= ВКЛАДКА 2: PAST CONTINUOUS ================= -->
+    <div id="tab-practice" class="tab-content">
+        <div class="task-header">
+            <h2>The pictures were taken yesterday at 6 o'clock.</h2>
+            <p>What were the people doing? Type the full sentence or click the words.</p>
+        </div>
+
+        <!-- Карточка текущего упражнения -->
+        <div class="ex-card" id="practiceCard">
+            <!-- Заполняется через JS -->
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="prevPractice()">← Prev</button>
+            <button class="btn" onclick="nextPractice()">Next →</button>
+        </div>
+        <div class="counter" id="practiceCounter">1 / 6</div>
+    </div>
+
+    <div class="footer-note">✧ Starlight 7 • Module 2a ✧</div>
+</div>
+
+<script>
+    // --- ДАННЫЕ ---
+    // Добавлено поле "question", чтобы различать he/she и they
+    const cardData = [
+        { phrase: "taking a guided tour of a museum", file: "1", sentence: "They were taking a guided tour of a museum.", question: "What were they doing?", words: ["They", "were", "taking", "a", "guided", "tour", "of", "a", "museum."] },
+        { phrase: "attending a rock concert", file: "2", sentence: "They were attending a rock concert.", question: "What were they doing?", words: ["They", "were", "attending", "a", "rock", "concert."] },
+        { phrase: "having a ballet lesson", file: "3", sentence: "They were having a ballet lesson.", question: "What were they doing?", words: ["They", "were", "having", "a", "ballet", "lesson."] },
+        { phrase: "reading a classic novel", file: "4", sentence: "He was reading a classic novel.", question: "What was he doing?", words: ["He", "was", "reading", "a", "classic", "novel."] },
+        { phrase: "practising playing the flute", file: "5", sentence: "She was practising playing the flute.", question: "What was she doing?", words: ["She", "was", "practising", "playing", "the", "flute."] },
+        { phrase: "watching traditional dancing", file: "6", sentence: "They were watching traditional dancing.", question: "What were they doing?", words: ["They", "were", "watching", "traditional", "dancing."] }
+    ];
+
+    // --- ЗВУКИ ---
+    function playSound(type) {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain); gain.connect(ctx.destination);
+            if (type === 'click') { osc.frequency.value = 600; gain.gain.value = 0.05; osc.start(); osc.stop(ctx.currentTime + 0.08); }
+        } catch(e) {}
+    }
+
+    // --- ОЗВУЧКА ---
+    function speakText(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = 'en-GB';
+            u.rate = 0.9;
+            window.speechSynthesis.speak(u);
+        }
+    }
+
+    // --- ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ---
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(btn.dataset.tab).classList.add('active');
+            playSound('click');
+            window.speechSynthesis.cancel();
+        });
+    });
+
+    // ================= ФЛЕШ-КАРТОЧКИ =================
+    let currentIndex = 0;
+    const flashcard = document.getElementById('flashcard');
+    const cardText = document.getElementById('cardText');
+    const cardImage = document.getElementById('cardImage');
+    const counter = document.getElementById('counter');
+
+    function loadImage(filename, callback) {
+        const exts = ['.jpg', '.jpeg', '.png'];
+        let i = 0;
+        const tryLoad = () => {
+            if (i >= exts.length) {
+                cardImage.src = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect width='400' height='400' fill='%23333'/%3E%3Ctext x='50%25' y='50%25' fill='white' font-family='Arial' font-size='20' text-anchor='middle' dominant-baseline='middle'%3EНет картинки%3C/text%3E%3C/svg%3E";
+                if (callback) callback();
+                return;
+            }
+            cardImage.onload = () => { if (callback) callback(); };
+            cardImage.onerror = () => { i++; tryLoad(); };
+            cardImage.src = filename + exts[i];
+        };
+        tryLoad();
+    }
+
+    function renderCard() {
+        const data = cardData[currentIndex];
+        cardText.textContent = data.phrase;
+        counter.textContent = `${currentIndex + 1} / ${cardData.length}`;
+        flashcard.classList.remove('flipped');
+        loadImage(data.file, () => {});
+    }
+
+    function flipCard() {
+        flashcard.classList.toggle('flipped');
+        const isFlipped = flashcard.classList.contains('flipped');
+        playSound('click');
+        if (isFlipped) speakText(cardData[currentIndex].phrase);
+    }
+
+    function nextCard() {
+        currentIndex = (currentIndex + 1) % cardData.length;
+        window.speechSynthesis.cancel();
+        renderCard();
+    }
+
+    function prevCard() {
+        currentIndex = (currentIndex - 1 + cardData.length) % cardData.length;
+        window.speechSynthesis.cancel();
+        renderCard();
+    }
+
+    // ================= ПРАКТИКА (ПО ОДНОЙ КАРТИНКЕ) =================
+    let practiceIndex = 0;
+    const practiceCard = document.getElementById('practiceCard');
+    const practiceCounter = document.getElementById('practiceCounter');
+
+    function renderPracticeCard() {
+        practiceCard.innerHTML = '';
+        const data = cardData[practiceIndex];
+        
+        practiceCounter.textContent = `${practiceIndex + 1} / ${cardData.length}`;
+
+        // 1. Картинка
+        const imgWrap = document.createElement('div');
+        imgWrap.className = 'ex-img-wrapper';
+        imgWrap.title = "Click to hear the answer";
+        imgWrap.onclick = () => speakText(data.sentence);
+
+        const img = document.createElement('img');
+        const exts = ['.jpg', '.jpeg', '.png'];
+        let eIdx = 0;
+        img.onerror = () => { eIdx++; if (eIdx < exts.length) img.src = data.file + exts[eIdx]; else img.style.display = 'none'; };
+        img.src = data.file + exts[eIdx];
+        
+        const playIcon = document.createElement('div');
+        playIcon.className = 'play-overlay';
+        playIcon.textContent = '🔊';
+
+        imgWrap.appendChild(img);
+        imgWrap.appendChild(playIcon);
+
+        // 2. Вопрос (What was he doing? / What were they doing?)
+        const label = document.createElement('div');
+        label.className = 'ex-label';
+        label.textContent = `${practiceIndex + 1}. ${data.question}`;
+
+        // 3. Поле ввода
+        const inputGroup = document.createElement('div');
+        inputGroup.className = 'input-group';
+        
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'ex-input';
+        input.placeholder = 'Type the sentence...';
+        input.id = 'practiceInput';
+
+        inputGroup.appendChild(input);
+
+        // 4. Банк слов (чипсы)
+        const wordBank = document.createElement('div');
+        wordBank.className = 'word-bank';
+        
+        const shuffledWords = [...data.words].sort(() => Math.random() - 0.5);
+        shuffledWords.forEach(w => {
+            const chip = document.createElement('span');
+            chip.className = 'word-chip';
+            chip.textContent = w;
+            chip.onclick = () => {
+                const inp = document.getElementById('practiceInput');
+                if (inp.value.length > 0 && !inp.value.endsWith(' ')) {
+                    inp.value += ' ';
+                }
+                inp.value += w;
+                playSound('click');
+            };
+            wordBank.appendChild(chip);
+        });
+
+        // Сборка карточки
+        practiceCard.appendChild(imgWrap);
+        practiceCard.appendChild(label);
+        practiceCard.appendChild(inputGroup);
+        practiceCard.appendChild(wordBank);
+    }
+
+    function nextPractice() {
+        practiceIndex = (practiceIndex + 1) % cardData.length;
+        renderPracticeCard();
+    }
+
+    function prevPractice() {
+        practiceIndex = (practiceIndex - 1 + cardData.length) % cardData.length;
+        renderPracticeCard();
+    }
+
+    // Запуск
+    renderCard();
+    renderPracticeCard();
+</script>
+
+</body>
+</html>
